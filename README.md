@@ -1,5 +1,7 @@
 # Tank 2016
 
+[Play the latest build here :)](https://s3.eu-central-1.amazonaws.com/ovi-projects/jstank2016/latest/index.html)
+
 This is a recreation of the timeless NES game Battle City, or TANK 1990 as it was known in Eastern Europe bootleg cartridges.
 
 The game is built with the awesome [Phaser](http://phaser.io/) engine in JavaScript of the EcmaScript 6 variant.
