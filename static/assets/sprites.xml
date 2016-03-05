@@ -1,0 +1,23 @@
+<TextureAtlas imagePath="sprites.png">
+	<SubTexture name="brick.png" x="20" y="117" width="8" height="8"/>
+	<SubTexture name="bullet.png" x="33" y="81" width="3" height="4"/>
+	<SubTexture name="castle.png" x="0" y="101" width="16" height="14"/>
+	<SubTexture name="castle_dead.png" x="18" y="46" width="14" height="14"/>
+	<SubTexture name="enemy_spawn1.png" x="18" y="92" width="11" height="11"/>
+	<SubTexture name="enemy_spawn2.png" x="18" y="62" width="13" height="13"/>
+	<SubTexture name="explosion1.png" x="18" y="105" width="11" height="10"/>
+	<SubTexture name="explosion2.png" x="18" y="31" width="15" height="13"/>
+	<SubTexture name="explosion3.png" x="0" y="0" width="32" height="29"/>
+	<SubTexture name="flag.png" x="0" y="66" width="16" height="15"/>
+	<SubTexture name="forest.png" x="31" y="102" width="8" height="8"/>
+	<SubTexture name="ice.png" x="31" y="92" width="8" height="8"/>
+	<SubTexture name="powerup_helmet.png" x="0" y="31" width="16" height="15"/>
+	<SubTexture name="right_enemy.png" x="33" y="62" width="7" height="7"/>
+	<SubTexture name="right_enemy2.png" x="33" y="71" width="7" height="8"/>
+	<SubTexture name="spawn_glow1.png" x="0" y="48" width="16" height="16"/>
+	<SubTexture name="spawn_glow2.png" x="0" y="83" width="16" height="16"/>
+	<SubTexture name="steel.png" x="0" y="117" width="8" height="8"/>
+	<SubTexture name="water1.png" x="10" y="117" width="8" height="8"/>
+	<SubTexture name="water2.png" x="30" y="117" width="8" height="8"/>
+	<SubTexture name="yellow_tank.png" x="18" y="77" width="13" height="13"/>
+</TextureAtlas>
