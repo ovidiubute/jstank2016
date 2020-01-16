@@ -21,7 +21,7 @@ class GameState extends Phaser.State {
 
     create() {
         this.fx = {
-            background: this.game.add.audio('background', 0.4, true),
+            background: this.game.add.audio('background', 1, true),
             bonus: this.game.add.audio('bonus'),
             brick: this.game.add.audio('brick'),
             explosion: this.game.add.audio('explosion'),
@@ -30,7 +30,7 @@ class GameState extends Phaser.State {
             gamestart: this.game.add.audio('gamestart'),
             score: this.game.add.audio('score'),
             steel: this.game.add.audio('steel'),
-            moving: this.game.add.audio('moving')
+            moving: this.game.add.audio('moving', 1, true)
         };
 
         this.fx.brick.allowMultiple = true;
@@ -194,32 +194,42 @@ class GameState extends Phaser.State {
         }
     }
 
-    gainPowerup(tank, powerup) {
-        console.log('Powerup1');
+    hitWorldEdge(bullet) {
+        bullet.kill();
+        this.fx.steel.play();
+    }
+
+    gainPowerup(_, powerup) {
         powerup.kill();
+
+        // Handle bonus logic
+
         this.fx.bonus.play();
     }
 
     update() {
         this.tank.body.velocity.setTo(0);
-        //this.fx.moving.stop();
+        
+        if (this.fx.moving.isPlaying) {
+            this.fx.moving.stop();
+        }
 
         if (this.cursors.up.isDown) {
             this.tank.angle = 0;
             this.tank.body.velocity.y -= this.tank.body.speed;
-            //this.fx.moving.play();
+            this.fx.moving.play();
         } else if (this.cursors.down.isDown) {
             this.tank.angle = 180;
             this.tank.body.velocity.y += this.tank.body.speed;
-            //this.fx.moving.play(true);
+            this.fx.moving.play();
         } else if (this.cursors.right.isDown) {
             this.tank.angle = 90;
             this.tank.body.velocity.x += this.tank.body.speed;
-            //this.fx.moving.play(true);
+            this.fx.moving.play();
         } else if (this.cursors.left.isDown) {
             this.tank.angle = -90;
             this.tank.body.velocity.x -= this.tank.body.speed;
-            //this.fx.moving.play(true);
+            this.fx.moving.play();
         }
 
         if (this.fireButton.isDown) {
@@ -236,6 +246,7 @@ class GameState extends Phaser.State {
         this.game.physics.arcade.collide(this.tank, this.castles);
         this.game.physics.arcade.overlap(this.tank, this.powerups, this.gainPowerup, null, this);
         this.game.physics.arcade.collide(this.tank, this.leftWorldBounds);
+        this.game.physics.arcade.overlap(this.bullets, this.leftWorldBounds, this.hitWorldEdge, null, this);
     }
 }
 
