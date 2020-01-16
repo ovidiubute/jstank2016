@@ -68,7 +68,10 @@ class GameState extends Phaser.State {
         this.game.physics.arcade.enable(helmetPowerup);
         helmetPowerup.lifespan = 30000;
         helmetPowerup.alpha = 0;
-        this.game.add.tween(helmetPowerup).to({alpha: 0.8}, 100, Phaser.Easing.Linear.None, true, 0, 1000, true);
+        helmetPowerup.events.onKilled.add(() => {
+            helmetPowerup.destroy();
+        }, this);
+        this.game.add.tween(helmetPowerup).to({alpha: 0.8}, 250, Phaser.Easing.Linear.None, true, 0, 1000, true);
 
         this.playerWeapon = {
             power: 1
