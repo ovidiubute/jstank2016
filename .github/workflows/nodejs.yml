@@ -34,4 +34,4 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.OVI_PROJECTS_AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: eu-central-1
         DEST_DIR: jstank2016 
-        SOURCE_DIR: 'build/latest'
+        SOURCE_DIR: 'jstank2016/latest'
