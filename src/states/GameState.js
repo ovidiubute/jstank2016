@@ -49,19 +49,20 @@ class GameState extends Phaser.State {
         graphics.drawRect(0, 224, 320, 16);
         graphics.drawRect(224, 0, 56, 224);
         graphics.endFill();
+        
+        // World bounds
         this.leftWorldBounds = this.game.add.sprite(0, 0, null);
         this.game.physics.arcade.enable(this.leftWorldBounds);
         this.leftWorldBounds.immovable = true;
-        this.leftWorldBounds.body.setSize(224, 16);
+        this.leftWorldBounds.body.setSize(16, 224);
 
         // Add current level flag
         this.game.add.sprite(250, 180, 'sprites', 'flag.png');
 
         this.players = this.game.add.group(undefined, 'players', false, true, Phaser.Physics.ARCADE);
         this.tank = this.game.add.sprite(91, 216, 'sprites', 'yellow_tank.png', this.players);
-        this.tank.body.speed = 80;
         this.tank.anchor.setTo(0.5);
-        this.tank.smoothed = false;
+        this.tank.smoothed = true;
 
         this.powerups = this.add.group();
         var helmetPowerup = this.game.add.sprite(150, 150, 'sprites', 'powerup_helmet.png', this.powerups);
@@ -196,7 +197,12 @@ class GameState extends Phaser.State {
 
     hitWorldEdge(bullet) {
         bullet.kill();
+
         this.fx.steel.play();
+        var explosion = this.explosions.getFirstExists(false);
+        explosion.reset(bullet.x, bullet.y);
+        explosion.animations.play('blip', 60, false, true);
+        this.fx.steel.stop();
     }
 
     gainPowerup(_, powerup) {
@@ -216,19 +222,19 @@ class GameState extends Phaser.State {
 
         if (this.cursors.up.isDown) {
             this.tank.angle = 0;
-            this.tank.body.velocity.y -= this.tank.body.speed;
+            this.tank.body.velocity.y -= 100;
             this.fx.moving.play();
         } else if (this.cursors.down.isDown) {
             this.tank.angle = 180;
-            this.tank.body.velocity.y += this.tank.body.speed;
+            this.tank.body.velocity.y += 100;
             this.fx.moving.play();
         } else if (this.cursors.right.isDown) {
             this.tank.angle = 90;
-            this.tank.body.velocity.x += this.tank.body.speed;
+            this.tank.body.velocity.x += 100;
             this.fx.moving.play();
         } else if (this.cursors.left.isDown) {
             this.tank.angle = -90;
-            this.tank.body.velocity.x -= this.tank.body.speed;
+            this.tank.body.velocity.x -= 100;
             this.fx.moving.play();
         }
 
