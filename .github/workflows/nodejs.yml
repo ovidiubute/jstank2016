@@ -32,4 +32,5 @@ jobs:
         AWS_S3_BUCKET: ovi-projects
         AWS_ACCESS_KEY_ID: ${{ secrets.OVI_PROJECTS_AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.OVI_PROJECTS_AWS_SECRET_ACCESS_KEY }}
+        DEST_DIR: jstank2016 
         SOURCE_DIR: 'build'
