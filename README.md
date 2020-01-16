@@ -29,7 +29,7 @@ Run a development build...
 
 ...or a production build.
 
-`npm run production`
+`npm run build`
 
 Development builds will copy `phaser.min.js` together with `phaser.map` and `phaser.js`
 Your ES6 code will be transpiled into ES5 and concatenated into a single file.
