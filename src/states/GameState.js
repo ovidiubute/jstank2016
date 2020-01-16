@@ -54,8 +54,8 @@ class GameState extends Phaser.State {
         this.leftWorldBounds.immovable = true;
         this.leftWorldBounds.body.setSize(224, 16);
 
-        var levelFlag = this.game.add.sprite(100, 20, 'sprites', 'flag.png');
-
+        // Add current level flag
+        this.game.add.sprite(250, 180, 'sprites', 'flag.png');
 
         this.players = this.game.add.group(undefined, 'players', false, true, Phaser.Physics.ARCADE);
         this.tank = this.game.add.sprite(91, 216, 'sprites', 'yellow_tank.png', this.players);
