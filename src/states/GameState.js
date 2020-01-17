@@ -62,7 +62,7 @@ class GameState extends Phaser.State {
         this.players = this.game.add.group(undefined, 'players', false, true, Phaser.Physics.ARCADE);
         this.tank = this.game.add.sprite(91, 216, 'sprites', 'yellow_tank.png', this.players);
         this.tank.anchor.setTo(0.5);
-        this.tank.smoothed = true;
+        this.tank.smoothed = false;
 
         this.powerups = this.add.group();
         var helmetPowerup = this.game.add.sprite(150, 150, 'sprites', 'powerup_helmet.png', this.powerups);
