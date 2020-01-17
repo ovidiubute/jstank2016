@@ -20,6 +20,8 @@ class GameState extends Phaser.State {
     }
 
     create() {
+
+        // Sound effects
         this.fx = {
             background: this.game.add.audio('background', 1, true),
             bonus: this.game.add.audio('bonus'),
@@ -42,6 +44,7 @@ class GameState extends Phaser.State {
             this.fx.background.play();
         }));
 
+        // Draw screen edges
         var graphics = this.game.add.graphics(0, 0);
         graphics.beginFill(0x999999);
         graphics.drawRect(0, 0, 16, 224);
@@ -59,11 +62,16 @@ class GameState extends Phaser.State {
         // Add current level flag
         this.game.add.sprite(250, 180, 'sprites', 'flag.png');
 
+        // Add player tank(s)
         this.players = this.game.add.group(undefined, 'players', false, true, Phaser.Physics.ARCADE);
         this.tank = this.game.add.sprite(91, 216, 'sprites', 'yellow_tank.png', this.players);
+        // this.tank.animations.add('enter', ['enemy_spawn1.png', 'enemy_spawn2.png'], 4, true);
         this.tank.anchor.setTo(0.5);
+        this.tank.health = Number.MAX_SAFE_INTEGER;
         this.tank.smoothed = false;
+        // this.tank.animations.play('enter');
 
+        // Add powerups
         this.powerups = this.add.group();
         var helmetPowerup = this.game.add.sprite(150, 150, 'sprites', 'powerup_helmet.png', this.powerups);
         this.game.physics.arcade.enable(helmetPowerup);
@@ -74,22 +82,19 @@ class GameState extends Phaser.State {
         }, this);
         this.game.add.tween(helmetPowerup).to({alpha: 0.8}, 250, Phaser.Easing.Linear.None, true, 0, 1000, true);
 
-        this.playerWeapon = {
-            power: 1
-        };
-
-        this.bricks = this.game.add.group(undefined, 'bricks', false, true, Phaser.Physics.ARCADE);
-        this.steelBlocks = this.game.add.group(undefined, 'steelBlocks', false, true, Phaser.Physics.ARCADE);
-        this.iceBlocks = this.game.add.group(undefined, 'iceBlocks', false, true, Phaser.Physics.ARCADE);
-        this.waterBlocks = this.game.add.group(undefined, 'waterBlocks', false, true, Phaser.Physics.ARCADE);
-
-        this.bulletTime = 0;
-
+        // Add castle
         this.castles = this.game.add.group(undefined, 'castles', false, true, Phaser.Physics.ARCADE);
         this.castle = this.game.add.sprite(112, 210, 'sprites', 'castle.png', this.castles);
         this.game.physics.arcade.enable(this.castle);
         this.castle.body.immovable = true;
 
+        // Add level blocks
+        this.bricks = this.game.add.group(undefined, 'bricks', false, true, Phaser.Physics.ARCADE);
+        this.steelBlocks = this.game.add.group(undefined, 'steelBlocks', false, true, Phaser.Physics.ARCADE);
+        this.iceBlocks = this.game.add.group(undefined, 'iceBlocks', false, true, Phaser.Physics.ARCADE);
+        this.waterBlocks = this.game.add.group(undefined, 'waterBlocks', false, true, Phaser.Physics.ARCADE);
+
+        // Add level sprites
         var levelData = this.game.cache.getText('level_1');
         var sprites = getSprites(levelData, this.game);
         sprites.forEach((sprite) => {
@@ -106,6 +111,12 @@ class GameState extends Phaser.State {
             }
         });
 
+        // Add bullets
+        this.playerWeapon = {
+            power: 1
+        };
+
+        this.bulletTime = 0;
         this.bullets = this.game.add.group(undefined, 'bullets', false, true, Phaser.Physics.ARCADE);
         for (var i = 0; i < 32; i++) {
             var b = this.game.add.sprite(0, 0, 'sprites', 'bullet.png', this.bullets);
@@ -115,6 +126,7 @@ class GameState extends Phaser.State {
             b.anchor.setTo(0.5);
         }
 
+        // Explosions
         this.explosions = this.game.add.group(undefined, 'explosions', false);
         for (var i = 0; i < 10; i++) {
             var e = this.game.add.sprite(0, 0, 'sprites', 'explosion1.png', this.explosions);
@@ -125,6 +137,7 @@ class GameState extends Phaser.State {
             e.anchor.setTo(0.5);
         }
 
+        // Manage input
         this.cursors = this.game.input.keyboard.createCursorKeys();
         this.fireButton = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     }
