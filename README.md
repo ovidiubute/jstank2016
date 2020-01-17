@@ -1,6 +1,6 @@
 # Tank 2016
 
-[Play the latest build here :)](https://s3.eu-central-1.amazonaws.com/ovi-projects/jstank2016/latest/index.html)
+[Play the latest build here :)](http://ovi-projects.s3-website.eu-central-1.amazonaws.com/jstank2016/latest/)
 
 This is a recreation of the timeless NES game Battle City, or TANK 1990 as it was known in Eastern Europe bootleg cartridges.
 
