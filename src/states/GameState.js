@@ -141,13 +141,21 @@ class GameState extends Phaser.State {
                 bullet.reset(this.tank.x, this.tank.y);
                 bullet.angle = this.tank.angle;
                 var speed = 300;
+
+                // Fire right
                 if (this.tank.angle == 90) {
                     bullet.body.velocity.x += speed;
-                } else if (this.tank.angle == 180) {
+
+                // Fire down
+                } else if (this.tank.angle == -180) {
                     bullet.body.velocity.y += speed;
+
+                // Fire up
                 } else if (this.tank.angle == 0) {
                     bullet.body.velocity.y -= speed;
-                } else if (this.tank.angle == -90) {
+
+                // Fire left
+                } else {
                     bullet.body.velocity.x -= speed;
                 }
                 this.bulletTime = this.game.time.now + 500;
