@@ -1,15 +1,11 @@
 class MenuState extends Phaser.State {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 
-    preload() {
+  preload() {}
 
-    }
-
-    create() {
-
-    }
+  create() {}
 }
 
 export default MenuState;

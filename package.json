@@ -1,7 +1,7 @@
 {
   "name": "jstank2016",
   "version": "0.0.1",
-  "description": "Recreation of Battle City NES game using Phaser written in ES6/ES2015 with Babel.",
+  "description": "Recreation of Battle City NES game using Phaser written in JavaScript.",
   "main": "src/index.js",
   "scripts": {
     "start": "gulp",
@@ -24,6 +24,7 @@
     "gulp-if": "^1.2.5",
     "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.6",
+    "prettier": "^1.19.1",
     "vinyl-source-stream": "^1.1.0",
     "yargs": "^3.16.1"
   },
