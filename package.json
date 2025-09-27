@@ -5,7 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "start": "gulp",
-    "build": "gulp build --production"
+    "build": "gulp build --production",
+    "dev": "gulp serve",
+    "clean": "gulp clean"
   },
   "repository": {
     "type": "git",
@@ -14,24 +16,26 @@
   "author": "Ovidiu Bute",
   "license": "MIT",
   "devDependencies": {
-    "babelify": "^6.1.3",
-    "browser-sync": "^2.8.0",
-    "browserify": "^11.0.0",
-    "del": "^1.2.0",
-    "exorcist": "^0.4.0",
-    "gulp": "^3.9.1",
-    "gulp-buffer": "0.0.2",
-    "gulp-if": "^1.2.5",
-    "gulp-uglify": "^1.2.0",
-    "gulp-util": "^3.0.6",
-    "prettier": "^1.19.1",
-    "vinyl-source-stream": "^1.1.0",
-    "yargs": "^3.16.1"
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.23.0",
+    "babelify": "^10.0.0",
+    "browser-sync": "^2.29.3",
+    "browserify": "^17.0.0",
+    "del": "^6.1.1",
+    "exorcist": "^2.0.0",
+    "gulp": "^4.0.2",
+    "gulp-buffer": "^0.0.2",
+    "gulp-if": "^3.0.0",
+    "gulp-uglify": "^3.0.2",
+    "gulp-util": "^3.0.2",
+    "prettier": "^3.0.3",
+    "vinyl-source-stream": "^2.0.0",
+    "yargs": "^17.7.2"
   },
   "dependencies": {
-    "phaser": "^2.4.1"
+    "phaser": "^2.6.2"
   },
   "engines": {
-    "node": "8.x"
+    "node": ">=14.0.0"
   }
 }
