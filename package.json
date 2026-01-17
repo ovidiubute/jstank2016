@@ -33,7 +33,7 @@
     "yargs": "^18.0.0"
   },
   "dependencies": {
-    "phaser-ce": "^2.20.2"
+    "phaser": "^3.90.0"
   },
   "engines": {
     "node": ">=18.0.0"

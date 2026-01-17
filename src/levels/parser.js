@@ -4,38 +4,35 @@ function getAtlasKey(symbol) {
   return constants.TILE_TO_ATLAS[symbol];
 }
 
-function getSprites(levelData, game) {
+function getSprites(levelData, scene) {
   return levelData
     .split(/\r\n|\r|\n/g)
     .join("")
     .split("")
     .map((tileSymbol, tileIndex) => {
-      var atlasKey = getAtlasKey(tileSymbol);
-      if (typeof atlasKey == "undefined") {
+      const atlasKey = getAtlasKey(tileSymbol);
+      if (typeof atlasKey === "undefined") {
         return null;
       }
 
-      var args = [game, tileIndex, atlasKey];
-      return getTerrainSprite.apply(null, args);
+      return getTerrainSprite(scene, tileIndex, atlasKey);
     })
-    .filter(sprite => {
-      return sprite != null;
-    });
+    .filter((sprite) => sprite != null);
 }
 
-function getTerrainSprite(game, tileIndex, imageKey) {
-  var sprite = new Phaser.Sprite(
-    game,
+function getTerrainSprite(scene, tileIndex, imageKey) {
+  const sprite = scene.physics.add.sprite(
     16 + xCoord(tileIndex),
     16 + yCoord(tileIndex),
     "sprites",
     imageKey
   );
-  game.physics.arcade.enable(sprite);
-  sprite.body.immovable = true;
+
+  sprite.setImmovable(true);
   sprite.extra = {
-    entityType: constants.ATLAS_TO_ENTITY_TYPE[imageKey]
+    entityType: constants.ATLAS_TO_ENTITY_TYPE[imageKey],
   };
+
   return sprite;
 }
 

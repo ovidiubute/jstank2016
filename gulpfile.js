@@ -15,7 +15,7 @@ const browserSync = require("browser-sync");
 /**
  * Using different folders/file names? Change these constants:
  */
-const PHASER_PATH = "./node_modules/phaser-ce/build/";
+const PHASER_PATH = "./node_modules/phaser/dist/";
 const BUILD_PATH = "./build";
 const SCRIPTS_PATH = BUILD_PATH + "/scripts";
 const SOURCE_PATH = "./src";
