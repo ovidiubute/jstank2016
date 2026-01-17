@@ -1,122 +1,112 @@
-class GameOverState extends Phaser.State {
+import Phaser from "phaser";
+
+class GameOverScene extends Phaser.Scene {
   constructor() {
-    super();
+    super({ key: "GameOverScene" });
     this.selectedOption = 0;
     this.options = [
       { text: "TRY AGAIN", action: "retry" },
-      { text: "MAIN MENU", action: "menu" }
+      { text: "MAIN MENU", action: "menu" },
     ];
     this.menuTexts = [];
-    this.gameOverText = null;
     this.score = 0;
     this.level = 1;
+    this.reason = "GAME OVER";
   }
 
-  init(score = 0, level = 1, reason = "GAME OVER") {
-    this.score = score;
-    this.level = level;
-    this.reason = reason;
+  init(data) {
+    this.score = data.score || 0;
+    this.level = data.level || 1;
+    this.reason = data.reason || "GAME OVER";
   }
 
   create() {
-    this.game.stage.backgroundColor = "#000000";
+    this.cameras.main.setBackgroundColor("#000000");
     this.createGameOverScreen();
     this.setupInput();
   }
 
   createGameOverScreen() {
-    // Clear any existing text
-    this.menuTexts.forEach(text => text.destroy());
+    this.menuTexts.forEach((text) => text.destroy());
     this.menuTexts = [];
 
-    // Game Over title
-    const titleStyle = {
-      font: "bold 24px Arial",
-      fill: "#FF0000",
-      align: "center"
-    };
-    
-    this.gameOverText = this.game.add.text(
-      this.game.world.centerX,
-      80,
-      this.reason,
-      titleStyle
-    );
-    this.gameOverText.anchor.setTo(0.5);
-    this.menuTexts.push(this.gameOverText);
+    const centerX = this.cameras.main.centerX;
 
-    // Score display
-    const scoreStyle = {
-      font: "16px Arial",
-      fill: "#FFFFFF",
-      align: "center"
-    };
-    
-    const scoreText = this.game.add.text(
-      this.game.world.centerX,
+    const gameOverText = this.add.text(centerX, 80, this.reason, {
+      fontFamily: "Arial",
+      fontSize: "24px",
+      fontStyle: "bold",
+      color: "#FF0000",
+      align: "center",
+    });
+    gameOverText.setOrigin(0.5);
+    this.menuTexts.push(gameOverText);
+
+    const scoreText = this.add.text(
+      centerX,
       120,
       `SCORE: ${this.score}`,
-      scoreStyle
+      {
+        fontFamily: "Arial",
+        fontSize: "16px",
+        color: "#FFFFFF",
+        align: "center",
+      }
     );
-    scoreText.anchor.setTo(0.5);
+    scoreText.setOrigin(0.5);
     this.menuTexts.push(scoreText);
 
-    // Level display
-    const levelText = this.game.add.text(
-      this.game.world.centerX,
+    const levelText = this.add.text(
+      centerX,
       140,
       `STAGE: ${this.level}`,
-      scoreStyle
+      {
+        fontFamily: "Arial",
+        fontSize: "16px",
+        color: "#FFFFFF",
+        align: "center",
+      }
     );
-    levelText.anchor.setTo(0.5);
+    levelText.setOrigin(0.5);
     this.menuTexts.push(levelText);
 
-    // Menu options
-    const optionStyle = {
-      font: "18px Arial",
-      fill: "#FFFFFF",
-      align: "center"
-    };
-
     this.options.forEach((option, index) => {
-      const y = 200 + (index * 30);
-      const text = this.game.add.text(
-        this.game.world.centerX,
-        y,
-        option.text,
-        optionStyle
-      );
-      text.anchor.setTo(0.5);
-      
+      const y = 200 + index * 30;
+      const text = this.add.text(centerX, y, option.text, {
+        fontFamily: "Arial",
+        fontSize: "18px",
+        color: "#FFFFFF",
+        align: "center",
+      });
+      text.setOrigin(0.5);
+
       if (index === this.selectedOption) {
-        text.fill = "#FFFF00";
+        text.setColor("#FFFF00");
         text.setShadow(2, 2, "#000000", 2);
       }
-      
+
       this.menuTexts.push(text);
     });
 
-    // Instructions
-    const instructionStyle = {
-      font: "12px Arial",
-      fill: "#CCCCCC",
-      align: "center"
-    };
-    
-    const instructions = this.game.add.text(
-      this.game.world.centerX,
+    const instructions = this.add.text(
+      centerX,
       280,
       "USE ARROW KEYS TO SELECT • PRESS ENTER TO CONFIRM",
-      instructionStyle
+      {
+        fontFamily: "Arial",
+        fontSize: "12px",
+        color: "#CCCCCC",
+        align: "center",
+      }
     );
-    instructions.anchor.setTo(0.5);
+    instructions.setOrigin(0.5);
     this.menuTexts.push(instructions);
   }
 
   setupInput() {
-    this.cursors = this.game.input.keyboard.createCursorKeys();
-    this.enterKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
-    this.spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    this.cursors = this.input.keyboard.createCursorKeys();
+    this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
   }
 
   update() {
@@ -124,17 +114,17 @@ class GameOverState extends Phaser.State {
   }
 
   handleInput() {
-    // Handle menu navigation
-    if (this.cursors.up.justDown) {
-      this.selectedOption = (this.selectedOption - 1 + this.options.length) % this.options.length;
+    if (Phaser.Input.Keyboard.JustDown(this.cursors.up)) {
+      this.selectedOption =
+        (this.selectedOption - 1 + this.options.length) %
+        this.options.length;
       this.updateMenuDisplay();
-    } else if (this.cursors.down.justDown) {
+    } else if (Phaser.Input.Keyboard.JustDown(this.cursors.down)) {
       this.selectedOption = (this.selectedOption + 1) % this.options.length;
       this.updateMenuDisplay();
     }
 
-    // Handle selection
-    if (this.enterKey.justDown || this.spaceKey.justDown) {
+    if (Phaser.Input.Keyboard.JustDown(this.enterKey) || Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
       this.selectOption();
     }
   }
@@ -144,10 +134,10 @@ class GameOverState extends Phaser.State {
       if (index >= 3 && index < 3 + this.options.length) {
         const optionIndex = index - 3;
         if (optionIndex === this.selectedOption) {
-          text.fill = "#FFFF00";
+          text.setColor("#FFFF00");
           text.setShadow(2, 2, "#000000", 2);
         } else {
-          text.fill = "#FFFFFF";
+          text.setColor("#FFFFFF");
           text.setShadow(0, 0, "#000000", 0);
         }
       }
@@ -156,16 +146,17 @@ class GameOverState extends Phaser.State {
 
   selectOption() {
     const selectedAction = this.options[this.selectedOption].action;
-    
+
     switch (selectedAction) {
       case "retry":
-        this.game.state.start("GameState", true, false, { level: this.level });
+        this.registry.set("currentLevel", this.level);
+        this.scene.start("GameScene");
         break;
       case "menu":
-        this.game.state.start("MenuState");
+        this.scene.start("MenuScene");
         break;
     }
   }
 }
 
-export default GameOverState;
+export default GameOverScene;
