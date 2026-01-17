@@ -1,8 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 const gulp = require("gulp");
-const argv = require("yargs").argv;
-const gutil = require("gulp-util");
+const argv = require("yargs")(process.argv.slice(2)).argv;
+const log = require("fancy-log");
 const source = require("vinyl-source-stream");
 const buffer = require("gulp-buffer");
 const uglify = require("gulp-uglify");
@@ -15,7 +15,7 @@ const browserSync = require("browser-sync");
 /**
  * Using different folders/file names? Change these constants:
  */
-const PHASER_PATH = "./node_modules/phaser/build/";
+const PHASER_PATH = "./node_modules/phaser-ce/build/";
 const BUILD_PATH = "./build";
 const SCRIPTS_PATH = BUILD_PATH + "/scripts";
 const SOURCE_PATH = "./src";
@@ -37,9 +37,9 @@ function isProduction() {
  */
 function logBuildMode() {
   if (isProduction()) {
-    gutil.log(gutil.colors.green("Running production build..."));
+    log.info("Running production build...");
   } else {
-    gutil.log(gutil.colors.yellow("Running development build..."));
+    log.warn("Running development build...");
   }
 }
 
@@ -110,7 +110,7 @@ function build() {
     .transform(babelify)
     .bundle()
     .on("error", function(error) {
-      gutil.log(gutil.colors.red("[Build Error]", error.message));
+      log.error("[Build Error]", error.message);
       this.emit("end");
     })
     .pipe(gulpif(!isProduction(), exorcist(sourcemapPath)))

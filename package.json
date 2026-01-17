@@ -16,26 +16,26 @@
   "author": "Ovidiu Bute",
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.23.0",
-    "@babel/preset-env": "^7.23.0",
+    "@babel/core": "^7.28.6",
+    "@babel/preset-env": "^7.28.6",
     "babelify": "^10.0.0",
-    "browser-sync": "^2.29.3",
-    "browserify": "^17.0.0",
-    "del": "^6.1.1",
+    "browser-sync": "^3.0.4",
+    "browserify": "^17.0.1",
+    "del": "^8.0.1",
     "exorcist": "^2.0.0",
-    "gulp": "^4.0.2",
+    "fancy-log": "^2.0.0",
+    "gulp": "^5.0.1",
     "gulp-buffer": "^0.0.2",
     "gulp-if": "^3.0.0",
     "gulp-uglify": "^3.0.2",
-    "gulp-util": "^3.0.2",
-    "prettier": "^3.0.3",
+    "prettier": "^3.8.0",
     "vinyl-source-stream": "^2.0.0",
-    "yargs": "^17.7.2"
+    "yargs": "^18.0.0"
   },
   "dependencies": {
-    "phaser": "^2.6.2"
+    "phaser-ce": "^2.20.2"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   }
 }
