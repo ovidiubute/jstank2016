@@ -11,6 +11,11 @@ class GameScene extends Phaser.Scene {
     this.score = 0;
     this.lives = 3;
     this.enemyCount = 20;
+    this.enemiesKilled = 0;
+    this.activeEnemies = 0;
+    this.maxActiveEnemies = 4;
+    this.isPlayerDead = false;
+    this.isRespawning = false;
   }
 
   init() {
@@ -20,6 +25,11 @@ class GameScene extends Phaser.Scene {
     this.score = 0;
     this.lives = 3;
     this.enemyCount = 20;
+    this.enemiesKilled = 0;
+    this.activeEnemies = 0;
+    this.maxActiveEnemies = 4;
+    this.isPlayerDead = false;
+    this.isRespawning = false;
   }
 
   preload() {
@@ -90,7 +100,24 @@ class GameScene extends Phaser.Scene {
     this.tank = this.physics.add.sprite(91, 216, "sprites", "yellow_tank.png");
     this.tank.setOrigin(0.5);
     this.tank.setCollideWorldBounds(true);
+    this.tank.alive = true;
+    this.tank.isInvulnerable = false;
     this.players.add(this.tank);
+
+    this.enemies = this.physics.add.group();
+    this.enemyBullets = this.physics.add.group({
+      defaultKey: "sprites",
+      defaultFrame: "bullet.png",
+      maxSize: 32,
+    });
+
+    for (let i = 0; i < 32; i++) {
+      const bullet = this.enemyBullets.create(0, 0, "sprites", "bullet.png");
+      bullet.setActive(false);
+      bullet.setVisible(false);
+      bullet.setOrigin(0.5);
+      bullet.setTint(0xff0000);
+    }
 
     this.createInvisibleWalls();
 
@@ -251,6 +278,69 @@ class GameScene extends Phaser.Scene {
       null,
       this
     );
+
+    this.physics.add.overlap(
+      this.bullets,
+      this.enemies,
+      this.hitEnemy,
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.enemyBullets,
+      this.tank,
+      this.hitPlayer,
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.enemyBullets,
+      this.bricks,
+      this.hitBricksEnemy,
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.enemyBullets,
+      this.steelBlocks,
+      this.hitSteelEnemy,
+      null,
+      this
+    );
+
+    this.physics.add.overlap(
+      this.enemyBullets,
+      this.castles,
+      this.destroyCastleEnemy,
+      null,
+      this
+    );
+
+    this.physics.add.collider(this.enemies, this.bricks);
+    this.physics.add.collider(this.enemies, this.waterBlocks);
+    this.physics.add.collider(this.enemies, this.steelBlocks);
+    this.physics.add.collider(this.enemies, this.castles);
+    this.physics.add.collider(this.enemies, this.invisibleWalls);
+    this.physics.add.collider(this.enemies, this.enemies);
+    this.physics.add.collider(this.tank, this.enemies);
+
+    this.spawnPoints = [
+      { x: 40, y: 40 },
+      { x: 112, y: 40 },
+      { x: 184, y: 40 },
+    ];
+
+    this.time.addEvent({
+      delay: 3000,
+      callback: this.spawnEnemy,
+      callbackScope: this,
+      loop: true,
+    });
+
+    this.spawnEnemy();
   }
 
   createInvisibleWalls() {
@@ -440,8 +530,15 @@ class GameScene extends Phaser.Scene {
 
   gainPowerup(tank, powerup) {
     powerup.destroy();
-    this.addScore(100);
+    this.addScore(500);
     this.fx.bonus.play();
+
+    this.playerWeapon.power = 2;
+    this.tank.isInvulnerable = true;
+
+    this.time.delayedCall(10000, () => {
+      this.tank.isInvulnerable = false;
+    });
   }
 
   addScore(points) {
@@ -450,8 +547,10 @@ class GameScene extends Phaser.Scene {
   }
 
   updateEnemyCounter() {
+    const remainingEnemies = this.enemyCount - this.enemiesKilled;
+    const iconsToShow = Math.ceil(remainingEnemies / 2);
     for (let i = 0; i < this.enemyTankIcons.length; i++) {
-      this.enemyTankIcons[i].setVisible(i < this.enemyCount);
+      this.enemyTankIcons[i].setVisible(i < iconsToShow);
     }
   }
 
@@ -485,6 +584,335 @@ class GameScene extends Phaser.Scene {
     }
   }
 
+  spawnEnemy() {
+    if (
+      this.enemiesKilled >= this.enemyCount ||
+      this.activeEnemies >= this.maxActiveEnemies
+    ) {
+      return;
+    }
+
+    const spawnPoint =
+      this.spawnPoints[Phaser.Math.Between(0, this.spawnPoints.length - 1)];
+
+    const spawnGlow = this.add.sprite(
+      spawnPoint.x,
+      spawnPoint.y,
+      "sprites",
+      "spawn_glow1.png"
+    );
+    spawnGlow.setOrigin(0.5);
+
+    if (!spawnGlow.anims.exists("spawn")) {
+      this.anims.create({
+        key: "spawn",
+        frames: [
+          { key: "sprites", frame: "spawn_glow1.png" },
+          { key: "sprites", frame: "spawn_glow2.png" },
+        ],
+        frameRate: 8,
+        repeat: 3,
+      });
+    }
+
+    spawnGlow.play("spawn");
+
+    this.time.delayedCall(1000, () => {
+      spawnGlow.destroy();
+
+      const enemy = this.physics.add.sprite(
+        spawnPoint.x,
+        spawnPoint.y,
+        "sprites",
+        "yellow_tank.png"
+      );
+      enemy.setOrigin(0.5);
+      enemy.setTint(0xff8888);
+      enemy.setCollideWorldBounds(true);
+      enemy.alive = true;
+      enemy.lastFire = 0;
+      enemy.lastDirectionChange = 0;
+      enemy.direction = Phaser.Math.Between(0, 3);
+
+      this.enemies.add(enemy);
+      this.activeEnemies++;
+    });
+  }
+
+  updateEnemyAI(enemy) {
+    if (!enemy.alive || !enemy.active) return;
+
+    const now = this.time.now;
+
+    if (now - enemy.lastDirectionChange > 2000) {
+      enemy.direction = Phaser.Math.Between(0, 3);
+      enemy.lastDirectionChange = now;
+    }
+
+    enemy.setVelocity(0, 0);
+
+    const speed = 60;
+    switch (enemy.direction) {
+      case 0:
+        enemy.setAngle(0);
+        enemy.setVelocityY(-speed);
+        break;
+      case 1:
+        enemy.setAngle(90);
+        enemy.setVelocityX(speed);
+        break;
+      case 2:
+        enemy.setAngle(180);
+        enemy.setVelocityY(speed);
+        break;
+      case 3:
+        enemy.setAngle(-90);
+        enemy.setVelocityX(-speed);
+        break;
+    }
+
+    if (now - enemy.lastFire > 2000) {
+      this.fireEnemyBullet(enemy);
+      enemy.lastFire = now;
+    }
+  }
+
+  fireEnemyBullet(enemy) {
+    const bullet = this.enemyBullets.getFirstDead(false);
+
+    if (bullet) {
+      bullet.setActive(true);
+      bullet.setVisible(true);
+      bullet.setPosition(enemy.x, enemy.y);
+      bullet.setAngle(enemy.angle);
+
+      const speed = 250;
+      const angle = enemy.angle;
+
+      if (angle === 90) {
+        bullet.setVelocity(speed, 0);
+      } else if (angle === 180 || angle === -180) {
+        bullet.setVelocity(0, speed);
+      } else if (angle === 0) {
+        bullet.setVelocity(0, -speed);
+      } else {
+        bullet.setVelocity(-speed, 0);
+      }
+
+      this.time.delayedCall(3000, () => {
+        if (bullet.active) {
+          bullet.setActive(false);
+          bullet.setVisible(false);
+          bullet.setVelocity(0, 0);
+        }
+      });
+    }
+  }
+
+  hitEnemy(bullet, enemy) {
+    if (!enemy.alive) return;
+
+    bullet.setActive(false);
+    bullet.setVisible(false);
+    bullet.setVelocity(0, 0);
+
+    enemy.alive = false;
+    this.activeEnemies--;
+    this.enemiesKilled++;
+
+    const explosion = this.explosions.getFirstDead(false);
+    if (explosion) {
+      explosion.setActive(true);
+      explosion.setVisible(true);
+      explosion.setPosition(enemy.x, enemy.y);
+      explosion.play("boom");
+
+      explosion.once("animationcomplete", () => {
+        explosion.setActive(false);
+        explosion.setVisible(false);
+      });
+    }
+
+    this.fx.explosion.play();
+    enemy.destroy();
+
+    this.addScore(100);
+    this.updateEnemyCounter();
+    this.checkLevelComplete();
+  }
+
+  hitPlayer(bullet, player) {
+    if (!player.alive || player.isInvulnerable || this.isPlayerDead) return;
+
+    bullet.setActive(false);
+    bullet.setVisible(false);
+    bullet.setVelocity(0, 0);
+
+    this.killPlayer();
+  }
+
+  killPlayer() {
+    if (this.isPlayerDead) return;
+
+    this.isPlayerDead = true;
+    this.tank.alive = false;
+
+    const explosion = this.explosions.getFirstDead(false);
+    if (explosion) {
+      explosion.setActive(true);
+      explosion.setVisible(true);
+      explosion.setPosition(this.tank.x, this.tank.y);
+      explosion.play("boom");
+
+      explosion.once("animationcomplete", () => {
+        explosion.setActive(false);
+        explosion.setVisible(false);
+      });
+    }
+
+    this.fx.explosion.play();
+    this.tank.setVisible(false);
+
+    this.lives--;
+    this.updateLivesDisplay();
+
+    if (this.lives <= 0) {
+      this.time.delayedCall(2000, () => {
+        this.fx.background.stop();
+        this.scene.start("GameOverScene", {
+          score: this.score || 0,
+          level: this.currentLevel,
+          reason: "GAME OVER",
+        });
+      });
+    } else {
+      this.time.delayedCall(2000, () => {
+        this.respawnPlayer();
+      });
+    }
+  }
+
+  respawnPlayer() {
+    this.tank.setPosition(91, 216);
+    this.tank.setAngle(0);
+    this.tank.setVisible(true);
+    this.tank.alive = true;
+    this.tank.isInvulnerable = true;
+    this.isPlayerDead = false;
+
+    let blinkCount = 0;
+    const blinkTimer = this.time.addEvent({
+      delay: 100,
+      callback: () => {
+        this.tank.setAlpha(this.tank.alpha === 1 ? 0.5 : 1);
+        blinkCount++;
+        if (blinkCount >= 20) {
+          this.tank.setAlpha(1);
+          this.tank.isInvulnerable = false;
+          blinkTimer.remove();
+        }
+      },
+      loop: true,
+    });
+  }
+
+  hitBricksEnemy(bullet, brick) {
+    bullet.setActive(false);
+    bullet.setVisible(false);
+    bullet.setVelocity(0, 0);
+
+    brick.destroy();
+    this.fx.brick.play();
+
+    const explosion = this.explosions.getFirstDead(false);
+    if (explosion) {
+      explosion.setActive(true);
+      explosion.setVisible(true);
+      explosion.setPosition(bullet.x, bullet.y);
+      explosion.play("impact");
+
+      explosion.once("animationcomplete", () => {
+        explosion.setActive(false);
+        explosion.setVisible(false);
+      });
+    }
+  }
+
+  hitSteelEnemy(bullet, steelBlock) {
+    bullet.setActive(false);
+    bullet.setVisible(false);
+    bullet.setVelocity(0, 0);
+
+    this.fx.steel.play();
+    const explosion = this.explosions.getFirstDead(false);
+    if (explosion) {
+      explosion.setActive(true);
+      explosion.setVisible(true);
+      explosion.setPosition(bullet.x, bullet.y);
+      explosion.play("blip");
+
+      explosion.once("animationcomplete", () => {
+        explosion.setActive(false);
+        explosion.setVisible(false);
+      });
+    }
+  }
+
+  destroyCastleEnemy(bullet, castle) {
+    if (castle.alive) {
+      bullet.setActive(false);
+      bullet.setVisible(false);
+      bullet.setVelocity(0, 0);
+
+      const explosion = this.explosions.getFirstDead(false);
+      if (explosion) {
+        explosion.setActive(true);
+        explosion.setVisible(true);
+        explosion.setPosition(castle.x + 5, castle.y + 5);
+        explosion.play("boom");
+
+        explosion.once("animationcomplete", () => {
+          explosion.setActive(false);
+          explosion.setVisible(false);
+        });
+      }
+
+      castle.setFrame("castle_dead.png");
+      castle.alive = false;
+
+      this.fx.explosion.once("complete", () => {
+        this.fx.background.stop();
+        this.scene.start("GameOverScene", {
+          score: this.score || 0,
+          level: this.currentLevel,
+          reason: "GAME OVER",
+        });
+      });
+      this.fx.explosion.play();
+    }
+  }
+
+  checkLevelComplete() {
+    if (this.enemiesKilled >= this.enemyCount) {
+      this.fx.background.stop();
+      this.fx.score.play();
+
+      this.time.delayedCall(2000, () => {
+        const nextLevel = this.currentLevel + 1;
+        if (nextLevel <= 35) {
+          this.registry.set("currentLevel", nextLevel);
+          this.scene.restart();
+        } else {
+          this.scene.start("GameOverScene", {
+            score: this.score || 0,
+            level: this.currentLevel,
+            reason: "CONGRATULATIONS!",
+          });
+        }
+      });
+    }
+  }
+
   update() {
     if (Phaser.Input.Keyboard.JustDown(this.pauseKey)) {
       this.togglePause();
@@ -499,41 +927,49 @@ class GameScene extends Phaser.Scene {
       return;
     }
 
-    this.tank.setVelocity(0, 0);
+    if (!this.isPlayerDead && this.tank.alive) {
+      this.tank.setVelocity(0, 0);
 
-    if (this.fx.moving.isPlaying) {
-      this.fx.moving.stop();
+      if (this.fx.moving.isPlaying) {
+        this.fx.moving.stop();
+      }
+
+      if (this.cursors.up.isDown) {
+        this.tank.setAngle(0);
+        this.tank.setVelocityY(-100);
+        if (!this.fx.moving.isPlaying) {
+          this.fx.moving.play();
+        }
+      } else if (this.cursors.down.isDown) {
+        this.tank.setAngle(180);
+        this.tank.setVelocityY(100);
+        if (!this.fx.moving.isPlaying) {
+          this.fx.moving.play();
+        }
+      } else if (this.cursors.right.isDown) {
+        this.tank.setAngle(90);
+        this.tank.setVelocityX(100);
+        if (!this.fx.moving.isPlaying) {
+          this.fx.moving.play();
+        }
+      } else if (this.cursors.left.isDown) {
+        this.tank.setAngle(-90);
+        this.tank.setVelocityX(-100);
+        if (!this.fx.moving.isPlaying) {
+          this.fx.moving.play();
+        }
+      }
+
+      if (this.fireButton.isDown) {
+        this.fireBullet();
+      }
     }
 
-    if (this.cursors.up.isDown) {
-      this.tank.setAngle(0);
-      this.tank.setVelocityY(-100);
-      if (!this.fx.moving.isPlaying) {
-        this.fx.moving.play();
+    this.enemies.children.entries.forEach((enemy) => {
+      if (enemy.alive && enemy.active) {
+        this.updateEnemyAI(enemy);
       }
-    } else if (this.cursors.down.isDown) {
-      this.tank.setAngle(180);
-      this.tank.setVelocityY(100);
-      if (!this.fx.moving.isPlaying) {
-        this.fx.moving.play();
-      }
-    } else if (this.cursors.right.isDown) {
-      this.tank.setAngle(90);
-      this.tank.setVelocityX(100);
-      if (!this.fx.moving.isPlaying) {
-        this.fx.moving.play();
-      }
-    } else if (this.cursors.left.isDown) {
-      this.tank.setAngle(-90);
-      this.tank.setVelocityX(-100);
-      if (!this.fx.moving.isPlaying) {
-        this.fx.moving.play();
-      }
-    }
-
-    if (this.fireButton.isDown) {
-      this.fireBullet();
-    }
+    });
   }
 }
 
